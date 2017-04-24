@@ -62,6 +62,7 @@ enum
     SPELL_CHARGE            =   26561,
     SPELL_REFLECT           =   9906,
     SPELL_FEAR              =   19408,
+    SPELL_ENRAGE            =   28747,
 
     // NPC General Andorov
     SPELL_AURA_OF_COMMAND   =   25516,
@@ -362,12 +363,12 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
 
         DoScriptText(SAY_AQ_WAR_START, m_creature);
 
-        chargeNewTargetNow = false;
+        chargeTargetNow = false;
         uint32  spellReflectTimer = 60000;
         uint32  AOEFearTimer = 45000;
     }
 
-    bool chargeNewTargetNow;
+    bool chargeTargetNow;
     uint32 spellReflectTimer;
     uint32 AOEFearTimer;
 
@@ -380,26 +381,10 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         if (m_uiResetAggro_Timer < uiDiff)
         {
             m_uiResetAggro_Timer = urand(9000, 12000);
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
-
-            chargeNewTargetNow = true;
+            chargeTargetNow = true;
         }
         else
             m_uiResetAggro_Timer -= uiDiff;
-
-        if (chargeNewTargetNow)
-        {
-            if (Unit* chargeVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-            {
-                if (DoCastSpellIfCan(chargeVictim, SPELL_CHARGE) == CAST_OK)
-                {
-                    if (!urand(0, 2))
-                        m_creature->getThreatManager().modifyThreatPercent(chargeVictim, 100);
-
-                    chargeNewTargetNow = false;
-                }
-            }
-        }
 
         if (AOEFearTimer < uiDiff)
         {
@@ -408,6 +393,22 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         }
         else
             AOEFearTimer -= uiDiff;
+
+        if (chargeTargetNow)
+        {
+            if (Unit* newVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                Unit* oldVictim = m_creature->getVictim();
+
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
+                {
+                    m_creature->getThreatManager().modifyThreatPercent(oldVictim, -100);
+                    m_creature->getThreatManager().modifyThreatPercent(newVictim, 100);
+
+                    chargeTargetNow = false;
+                }
+            }
+        }
 
         if (spellReflectTimer < uiDiff)
         {
@@ -418,6 +419,9 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
                 if (m_creature->GetHealthPercent() < 33.0f)
                     spellReflectTimer /= 2;
             }
+
+            if (m_creature->GetHealthPercent() < 10)
+                DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CAST_AURA_NOT_PRESENT);
         }
         else
             spellReflectTimer -= uiDiff;

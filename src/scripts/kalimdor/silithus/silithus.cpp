@@ -1106,7 +1106,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         if (!who->isAlive())
             return;
 
-        playerDetected = m_creature->IsWithinDistInMap(who, 50.0f) ? true : false;
+        playerDetected = m_creature->IsWithinDistInMap(who, 45.0f) ? true : false;
     }
 
     bool MoreThanOnePlayerNear()
@@ -1163,8 +1163,8 @@ struct npc_resonating_CrystalAI : public ScriptedAI
             if (m_uiWisperingsTimer < uiDiff)
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS) == CAST_OK)
-                        m_uiWisperingsTimer = 30000;
+                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                        m_uiWisperingsTimer = 20000;
             }
             else
                 m_uiWisperingsTimer -= uiDiff;
@@ -3288,6 +3288,7 @@ enum
     MAX_QIRAJI_CRYSTALS     = 6,
     VAR_CRYSTALS_AWARDED    = 1,
 
+    QUEST_MIGHT_OF_KALIMDOR = 8742,
     QUEST_BANG_A_GONG       = 8743,
 
     GLOBAL_TEXT_CHAMPION    = -1000007,
@@ -3311,7 +3312,7 @@ enum
     NPC_RAJAXX              = 15341,
 };
 
-static EventLocations rajaxxSpawnPoint = { -8106.35f, 1523.41f, 2.61f, 0.06166f, 0 };
+static const EventLocations rajaxxSpawnPoint = { -8106.35f, 1523.41f, 2.61f, 0.06166f, 0 };
 
 struct scarab_gongAI: public GameObjectAI
 {
@@ -3491,8 +3492,8 @@ bool GOHello_scarab_gong(Player* player, GameObject* go)
     if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
         return false;
 
-    player->PrepareQuestMenu(go->GetGUID());
-    player->SendPreparedQuest(go->GetGUID());
+    player->PrepareQuestMenu(go->GetObjectGuid());
+    player->SendPreparedQuest(go->GetObjectGuid());
 
     return true;
 }
@@ -4425,6 +4426,6 @@ void AddSC_silithus()
     pNewScript->Name = "go_scarab_gong";
     pNewScript->GOGetAI = &GetAIscarab_gong;
     pNewScript->pQuestRewardedGO = &QuestRewarded_scarab_gong;
-    pNewScript->pGOHello = &GOHello_scarab_gong;
+    pNewScript->pGOGossipHello = &GOHello_scarab_gong;
     pNewScript->RegisterSelf();
 }
