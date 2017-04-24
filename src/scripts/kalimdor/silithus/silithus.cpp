@@ -3307,7 +3307,11 @@ enum
     STAGE_OPEN_GATES        = 0,
     STAGE_WAR               = 1,
     STAGE_RESET             = 2,
+
+    NPC_RAJAXX              = 15341,
 };
+
+static EventLocations rajaxxSpawnPoint = { -8106.35f, 1523.41f, 2.61f, 0.06166f, 0 };
 
 struct scarab_gongAI: public GameObjectAI
 {
@@ -3404,6 +3408,13 @@ struct scarab_gongAI: public GameObjectAI
         {
             case 0:
                 sGameEventMgr.StartEvent(GAME_EVENT_CRYSTALS, true);
+                eventTimer = 10000;
+
+                break;
+
+            // Summon Rajaxx
+            case 1:
+                me->SummonCreature(NPC_RAJAXX, rajaxxSpawnPoint.m_fX, rajaxxSpawnPoint.m_fY, rajaxxSpawnPoint.m_fZ, rajaxxSpawnPoint.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
 
                 return EventDone();
         }
