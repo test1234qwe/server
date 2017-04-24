@@ -1160,7 +1160,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         // Whisperings of C'Thun (MC)
         if (MoreThanOnePlayerNear())
         {
-            if (m_uiWisperingsTimer < uiDiff)
+            if (m_uiWisperingsTimer < uiDiff || (m_creature->GetCharm() && m_creature->GetCharm()->IsPolymorphed()))
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS, CAST_AURA_NOT_PRESENT) == CAST_OK)
@@ -3487,10 +3487,11 @@ bool GOHello_scarab_gong(Player* player, GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
         return false;
 
-    uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
+    //uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
 
-    if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
-        return false;
+    // Not used since we moved to time-based window
+    //if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
+    //    return false;
 
     player->PrepareQuestMenu(go->GetObjectGuid());
     player->SendPreparedQuest(go->GetObjectGuid());
@@ -3506,8 +3507,9 @@ bool QuestRewarded_scarab_gong(Player* player, GameObject* go, Quest const* ques
     uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
 
     // Just to be sure
-    if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
-        return false;
+    // Not used since we moved to time-based window
+    //if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
+    //    return false;
 
     // Increment number of black crystals given
     sObjectMgr.SetSavedVariable(VAR_CRYSTALS_AWARDED, crystalsAwarded + 1, true);

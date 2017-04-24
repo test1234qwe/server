@@ -394,22 +394,6 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         else
             AOEFearTimer -= uiDiff;
 
-        if (chargeTargetNow)
-        {
-            if (Unit* newVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-            {
-                Unit* oldVictim = m_creature->getVictim();
-
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
-                {
-                    m_creature->getThreatManager().modifyThreatPercent(oldVictim, -100);
-                    m_creature->getThreatManager().modifyThreatPercent(newVictim, 100);
-
-                    chargeTargetNow = false;
-                }
-            }
-        }
-
         if (spellReflectTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_REFLECT) == CAST_OK)
@@ -445,6 +429,23 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
             m_uiDisarm_Timer -= uiDiff;
 
         DoMeleeAttackIfReady();
+
+        if (chargeTargetNow)
+        {
+            if (Unit* newVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                Unit* oldVictim = m_creature->getVictim();
+
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
+                {
+                    m_creature->getThreatManager().modifyThreatPercent(oldVictim, -100);
+                    m_creature->getThreatManager().modifyThreatPercent(newVictim, 100);
+
+                    chargeTargetNow = false;
+                }
+            }
+        }
+
     }
 };
 
